@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const BAG = {
+            "red": 12,
+            "green": 13,
+            "blue": 14
+        }
+
+        async function main() {
+            const res = await fetch('/input.txt');
+            const input = (await res.text()).split('\n');
+
+            let powersSum = 0;
+
+            input.forEach((line) => {
+                [game, moves] = line.split(':');
+                const id = +game.split(' ')[1];
+
+                const parsedMoves = parseMoves(moves);
+                const max = {
+                    "red": 0,
+                    "green": 0,
+                    "blue": 0
+                }
+
+                for(const move of parsedMoves) {
+                    for (const [color, count] of move) {
+                        if(max[color] < count) {
+                            max[color] = count;
+                        }
+                    }
+                }
+                const coloursPower = max["red"] * max["green"] * max["blue"]
+                powersSum += coloursPower;
+            });
+
+            alert(powersSum);
+        };
+
+        function parseMoves(moves) {
+            return moves.split(";").map((move) => {
+                const pulled = move.split(',');
+                return pulled.map(move => {
+                    const [count, color] = move.trim().split(' ')
+                    return [color, parseInt(count)];
+                });
+            });
+        }
+
+        main();
+    </script>
+</body>
+
+</html>
