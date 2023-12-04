@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        async function main() {
+            const res = await fetch('/input.txt');
+            let input = (await res.text()).split('\n');
+
+            // wrap input inside . => avoid checking for out of bounds
+            const padding = '.'.repeat(input[0].length);
+            input.splice(0, 0, padding);
+            input.push(padding);
+            input = input.map((line) => `.${line}.`);
+
+            let currentNumber = 0;
+            const possibleGears = {};
+            let neighborhoudGears = new Set();
+
+            for (let i = 1; i < input.length - 1; ++i) {
+                for (let j = 1; j < input[i].length - 1; ++j) {
+                    if (input[i][j] >= '0' && input[i][j] <= '9') {
+                        currentNumber = currentNumber * 10 + parseInt(input[i][j]);
+                        possibleGearsInNeighborhood(input, i, j).forEach((gear) => {
+                            neighborhoudGears.add(gear);
+                        });
+                    } else {
+                        neighborhoudGears.forEach((gear) => {
+                            possibleGears[gear] ||= [];
+                            possibleGears[gear].push(currentNumber);
+                        });
+                        currentNumber = 0;
+                        neighborhoudGears = new Set();
+                    }
+                }
+                    neighborhoudGears.forEach((gear) => {
+                        possibleGears[gear] ||= [];
+                        possibleGears[gear].push(currentNumber)
+                    });
+                    currentNumber = 0;
+                    neighborhoudGears = new Set();
+
+            }
+            
+            const sum = Object.values(possibleGears).filter(neighbors => neighbors.length === 2)
+                                        .map(([n1, n2]) => n1 * n2)
+                                        .reduce((a, b) => a + b, 0);
+            alert(sum);
+
+        }
+
+        function possibleGearsInNeighborhood(input, x, y) {
+            const possibleGears = [];
+            for (let i = x - 1; i <= x + 1; ++i) {
+                for (let j = y - 1; j <= y + 1; ++j) {
+                    if (input[i][j] === '*') {
+                        possibleGears.push(`${i},${j}`);
+                    }
+                }
+            }
+            return possibleGears;
+        }
+
+        main();
+    </script>
+</body>
+
+</html>

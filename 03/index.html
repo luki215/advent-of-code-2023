@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        async function main() {
+            const res = await fetch('/input.txt');
+            let input = (await res.text()).split('\n');
+
+            // wrap input inside . => avoid checking for out of bounds
+            const padding = '.'.repeat(input[0].length);
+            input.splice(0, 0, padding);
+            input.push(padding);
+            input = input.map((line) => `.${line}.`);
+
+            let currentNumber = 0;
+            let symbolInNeighbourhood = false;
+            let partsSum = 0;
+
+            for(let i = 1; i < input.length - 1; ++i) {
+                for(let j = 1; j < input[i].length - 1; ++j) {
+                    if(input[i][j] >= '0' && input[i][j] <= '9') {
+                        currentNumber = currentNumber * 10 + parseInt(input[i][j]);
+                        symbolInNeighbourhood = symbolInNeighbourhood || hasSymbolInNeighbourhood(input, i, j);
+                    } else {
+                        if(symbolInNeighbourhood) {
+                            partsSum += currentNumber;
+                        }
+                        symbolInNeighbourhood = false;
+                        currentNumber = 0;
+                    }
+                }
+                if(symbolInNeighbourhood) {
+                    partsSum += currentNumber;
+                }
+                symbolInNeighbourhood = false;
+                currentNumber = 0;
+            }
+            alert(partsSum)
+        }
+
+        function hasSymbolInNeighbourhood(input, x, y) {
+            for(let i = x - 1; i <= x + 1; ++i) {
+                for(let j = y - 1; j <= y + 1; ++j) {
+                    if(input[i][j] === '.')
+                        continue;
+                    if(input[i][j] >= '0' && input[i][j] <= '9')
+                        continue;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        main();
+    </script>
+</body>
+
+</html>

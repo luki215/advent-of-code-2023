@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        async function main() {
+            const res = await fetch('/input.txt');
+            let input = (await res.text()).split('\n');
+
+
+            const cardCounts = []
+            input.forEach((line, i) => {
+                cardCounts[i] ||= 0;
+                cardCounts[i]++;
+
+                let [winning, have] = line.split(':')[1].split('|');
+
+                winningNumbers = winning.trim().split(/\s+/).map(x => parseInt(x));
+                haveNumbers = have.trim().split(/\s+/).map(x => parseInt(x));
+
+                let count = 0;
+                haveNumbers.forEach(x => {
+                    if (winningNumbers.includes(x)) {
+                        count++;
+                    }
+                });
+
+                for(let j = i+1; j < i + count + 1; j++) {
+                    cardCounts[j] ||= 0;
+                    cardCounts[j]+=cardCounts[i];
+                }
+            });
+
+            alert(cardCounts.reduce((acc, x) => acc + x, 0));
+          
+        }
+
+        main();
+    </script>
+</body>
+
+</html>

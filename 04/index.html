@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        async function main() {
+            const res = await fetch('/input.txt');
+            let input = (await res.text()).split('\n');
+            let deckSum = 0;
+
+            input.forEach(line => {
+                let [winning, have] = line.split(':')[1].split('|');
+
+                winningNumbers = winning.trim().split(/\s+/).map(x => parseInt(x));
+                haveNumbers = have.trim().split(/\s+/).map(x => parseInt(x));
+
+                let count = 0;
+                haveNumbers.forEach(x => {
+                    if (winningNumbers.includes(x)) {
+                        count++;
+                    }
+                });
+
+                if(count > 0)
+                    deckSum += 2 ** (count-1);
+
+            });
+
+            alert(deckSum)
+          
+        }
+
+        main();
+    </script>
+</body>
+
+</html>
