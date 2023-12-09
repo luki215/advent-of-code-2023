@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        async function main() {
+            const res = await fetch('/input.txt');
+            const input = (await res.text()).split('\n\n');
+
+            const seeds = input[0].split(' ').slice(1).map(x => parseInt(x));
+            let mapped = [...seeds];
+
+            input.slice(1).map(i => i.split('\n').slice(1).map(m => m.split(' ').map(n => parseInt(n)))).forEach(map => {
+                mapped = mapped.map(current => {
+                    const mapping = map.find(([mappedStart, originalStart, length]) => current >= originalStart && current < originalStart + length)
+                    if(mapping) {
+                        return mapping[0] + current - mapping[1];
+                    } else {
+                        return current;
+                    }
+                });
+                console.log(mapped);
+            })
+          
+            alert(Math.min(...mapped));
+
+
+        }
+
+        main();
+    </script>
+</body>
+
+</html>

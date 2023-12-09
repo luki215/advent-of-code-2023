@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        async function main() {
+            const res = await fetch('/input.txt');
+            const input = (await res.text()).split('\n\n');
+
+            const seeds = input[0].split(' ').slice(1).map(x => parseInt(x));
+            
+            let mappedSeeds = [...seeds];
+
+            input.slice(1).map(i => i.split('\n').slice(1).map(m => m.split(' ').map(n => parseInt(n)))).forEach((map, map_idx) => {
+                newMapped = [];
+
+                for(let i = 0; i < mappedSeeds.length; i+=2) {
+                    const mappedSeedStart = mappedSeeds[i];
+                    const mappedSeedEnd = mappedSeeds[i] + mappedSeeds[i+1];
+
+                    const appliableMappingsOverlapingRange = map
+                    // overlaps
+                    .filter(([_, start, length]) => Math.max(mappedSeedStart, start) < Math.min(mappedSeedEnd, start + length))
+                    .sort(([_, start1, length1], [__, start2, length2]) => start1 - start2);
+
+                    const startsBreakpoints = appliableMappingsOverlapingRange.filter(([_, start, length]) => start > mappedSeedStart).map(([_,start, __]) => start);
+                    const endBreakpoints = appliableMappingsOverlapingRange.filter(([_, start, length]) => start+ length < mappedSeedEnd).map(([_,start, length]) => start + length);
+                    const breakPoints = [...new Set([mappedSeedStart, ...startsBreakpoints, ...endBreakpoints, mappedSeedEnd])];
+                    
+                    const mappedBreakpoints = breakPoints.map(breakpoint => {
+                        const mapping = appliableMappingsOverlapingRange.find(([mappedStart, originalStart, length]) => breakpoint >= originalStart && breakpoint < originalStart + length)
+                        if(mapping) {
+                            return mapping[0] + breakpoint - mapping[1];
+                        } else {
+                            return breakpoint;
+                        }
+                    });
+
+                    for(let j = 0; j < mappedBreakpoints.length - 1; j++) {
+                        newMapped.push(mappedBreakpoints[j]);
+                        newMapped.push(breakPoints[j+1] - breakPoints[j]);
+                    }
+
+                }
+                mappedSeeds = newMapped;
+            })
+          
+            alert(Math.min(...mappedSeeds.filter((_, i) => i % 2 == 0)));
+        }
+
+        main();
+    </script>
+</body>
+
+</html>
