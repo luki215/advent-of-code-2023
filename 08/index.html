@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        async function main() {
+            const res = await fetch('/input.txt');
+            const input = (await res.text()).split('\n');
+            const instructions = input[0];
+
+            input.shift()
+            input.shift();
+
+            let map = {}
+
+            input.forEach(line => {
+                const [key, L, R] = line.split(/[^A-Z]+/);
+                map[key] = { L,  R };
+            });
+
+            let steps = 0;
+            let next = 'AAA';
+            while(next !== 'ZZZ') {
+                const nextSteps = map[next];
+                const nextStep = instructions[steps % instructions.length];
+                next = nextSteps[nextStep];
+                steps++;
+            }
+
+            alert(steps)
+
+        }
+
+        main();
+    </script>
+</body>
+
+</html>

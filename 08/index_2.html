@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        async function main() {
+            const res = await fetch('/input.txt');
+            const input = (await res.text()).split('\n');
+            const instructions = input[0];
+
+            input.shift()
+            input.shift();
+
+            let map = {}
+
+            input.forEach(line => {
+                const [key, L, R] = line.split(/[^A-Z0-9]+/);
+                map[key] = { L,  R };
+            });
+
+            let steps = 0;
+            let current = Object.keys(map).filter(key => key.endsWith('A'));
+            let indexesOfFirstZ = current.map(key => -1);
+            
+            while(indexesOfFirstZ.some(index => index === -1)) {
+                const nextStep = instructions[steps % instructions.length];
+                current = current.map(key => map[key][nextStep]);
+                steps++;
+
+                current.forEach((key, i) => {
+                    if(key.endsWith('Z')) {
+                        if(indexesOfFirstZ[i] === -1) {
+                            indexesOfFirstZ[i] = steps ;
+                        }
+                    }
+                });
+            }
+
+            function gcd(a, b){
+                // Euclidean algorithm
+                while (b != 0){
+                    var temp = b;
+                    b = a % b;
+                    a = temp;
+                }
+                return a;
+            }
+
+            function lcm(a, b){
+                return (a * b / gcd(a, b));
+            }
+
+            function lcmm(args){
+                // Recursively iterate through pairs of arguments
+                // i.e. lcm(args[0], lcm(args[1], lcm(args[2], args[3])))
+
+                if(args.length == 2){
+                    return lcm(args[0], args[1]);
+                } else {
+                    var arg0 = args[0];
+                    args.shift();
+                    return lcm(arg0, lcmm(args));
+                }
+            }
+
+            console.log(indexesOfFirstZ)
+
+            alert(lcmm(indexesOfFirstZ))
+
+        }
+
+        main();
+    </script>
+</body>
+
+</html>
